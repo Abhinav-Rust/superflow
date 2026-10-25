@@ -11,7 +11,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'otel-gateway',
         type: 'gateway',
-        position: { x: 50, y: 160 },
+        position: { x: 40, y: 160 },
         data: {
           label: 'Telemetry Ingestion Gateway',
           type: 'gateway',
@@ -24,7 +24,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'log-buffer-queue',
         type: 'queue',
-        position: { x: 420, y: 160 },
+        position: { x: 410, y: 160 },
         data: {
           label: 'Transient Log Buffer',
           type: 'queue',
@@ -38,7 +38,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'causal-engine',
         type: 'service',
-        position: { x: 790, y: 160 },
+        position: { x: 780, y: 160 },
         data: {
           label: 'Causal State DAG Engine',
           type: 'service',
@@ -51,7 +51,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'safety-invariant-gate',
         type: 'invariant',
-        position: { x: 1160, y: 40 },
+        position: { x: 1150, y: 35 },
         data: {
           label: 'Turchin Invariant Safety Gate',
           type: 'invariant',
@@ -64,7 +64,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'incident-vector-db',
         type: 'database',
-        position: { x: 1160, y: 300 },
+        position: { x: 1150, y: 295 },
         data: {
           label: 'Incident Vector Store',
           type: 'database',
@@ -77,7 +77,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'mitigation-dispatcher',
         type: 'service',
-        position: { x: 1540, y: 160 },
+        position: { x: 1520, y: 160 },
         data: {
           label: 'Mitigation Dispatcher',
           type: 'service',
@@ -124,6 +124,13 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
         animated: true,
         data: { label: 'verified execution', protocol: 'sync' },
       },
+      {
+        id: 'e6',
+        source: 'incident-vector-db',
+        target: 'mitigation-dispatcher',
+        animated: true,
+        data: { label: 'context enrich', protocol: 'async' },
+      },
     ],
   },
   {
@@ -136,7 +143,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'feed-handler',
         type: 'gateway',
-        position: { x: 50, y: 160 },
+        position: { x: 40, y: 160 },
         data: {
           label: 'L3 Feed Handler (ITCH/OUCH)',
           type: 'gateway',
@@ -149,7 +156,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'staging-queue',
         type: 'queue',
-        position: { x: 420, y: 160 },
+        position: { x: 410, y: 160 },
         data: {
           label: 'Staging Ring Buffer',
           type: 'queue',
@@ -163,7 +170,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'signal-engine',
         type: 'service',
-        position: { x: 790, y: 160 },
+        position: { x: 780, y: 160 },
         data: {
           label: 'Microstructure Signal Core',
           type: 'service',
@@ -176,7 +183,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'risk-invariant-gate',
         type: 'invariant',
-        position: { x: 1160, y: 40 },
+        position: { x: 1150, y: 35 },
         data: {
           label: 'Synchronous Risk Invariant Gate',
           type: 'invariant',
@@ -189,7 +196,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'fill-ledger',
         type: 'database',
-        position: { x: 1160, y: 300 },
+        position: { x: 1150, y: 295 },
         data: {
           label: 'Fill & Position Ledger',
           type: 'database',
@@ -202,7 +209,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'dma-router',
         type: 'service',
-        position: { x: 1540, y: 160 },
+        position: { x: 1520, y: 160 },
         data: {
           label: 'DMA Exchange Router',
           type: 'service',
@@ -214,11 +221,12 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       },
     ],
     edges: [
-      { id: 'h1', source: 'feed-handler', target: 'staging-queue', animated: true, data: { protocol: 'sync' } },
-      { id: 'h2', source: 'staging-queue', target: 'signal-engine', animated: true, data: { protocol: 'sync' } },
-      { id: 'h3', source: 'signal-engine', target: 'risk-invariant-gate', animated: true, data: { protocol: 'sync' } },
-      { id: 'h4', source: 'signal-engine', target: 'fill-ledger', animated: true, data: { protocol: 'async' } },
-      { id: 'h5', source: 'risk-invariant-gate', target: 'dma-router', animated: true, data: { protocol: 'sync' } },
+      { id: 'h1', source: 'feed-handler', target: 'staging-queue', animated: true, data: { label: 'L3 raw ticks', protocol: 'sync' } },
+      { id: 'h2', source: 'staging-queue', target: 'signal-engine', animated: true, data: { label: 'atomic pop', protocol: 'sync' } },
+      { id: 'h3', source: 'signal-engine', target: 'risk-invariant-gate', animated: true, data: { label: 'order intent', protocol: 'sync' } },
+      { id: 'h4', source: 'signal-engine', target: 'fill-ledger', animated: true, data: { label: 'audit shadow', protocol: 'async' } },
+      { id: 'h5', source: 'risk-invariant-gate', target: 'dma-router', animated: true, data: { label: 'risk cleared DMA', protocol: 'sync' } },
+      { id: 'h6', source: 'fill-ledger', target: 'dma-router', animated: true, data: { label: 'position check', protocol: 'async' } },
     ],
   },
 ];

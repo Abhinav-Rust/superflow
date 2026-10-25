@@ -38,8 +38,8 @@ export function VoiceInputBar({
     <header
       className={`w-full border-b backdrop-blur-xl z-20 shrink-0 select-none transition-colors duration-200 ${
         isDark
-          ? 'bg-neutral-950/90 border-neutral-800/80 text-neutral-100'
-          : 'bg-white/90 border-neutral-200 text-neutral-900 shadow-sm'
+          ? 'bg-[#050505] border-neutral-800/80 text-neutral-100'
+          : 'bg-white border-neutral-200 text-neutral-900 shadow-sm'
       }`}
     >
       <div className="max-w-[1700px] mx-auto px-4 py-2.5 space-y-2.5">
@@ -109,14 +109,24 @@ export function VoiceInputBar({
             {/* Theme Toggle Button */}
             <button
               onClick={onToggleTheme}
-              className={`p-1.5 rounded-lg border transition ${
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-mono font-semibold transition ${
                 isDark
-                  ? 'bg-neutral-900 border-neutral-800 text-amber-400 hover:bg-neutral-800'
-                  : 'bg-neutral-100 border-neutral-200 text-neutral-700 hover:bg-neutral-200'
+                  ? 'bg-neutral-900 border-neutral-800 hover:bg-neutral-800'
+                  : 'bg-neutral-100 border-neutral-300 hover:bg-neutral-200'
               }`}
-              title={`Switch to ${isDark ? 'Light' : 'Dark'} Theme`}
+              title={`Current Theme: ${isDark ? 'Dark (Obsidian)' : 'Light (Pure White)'}. Click to switch.`}
             >
-              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {isDark ? (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-cyan-400 fill-cyan-400/20" />
+                  <span className="text-[11px] text-neutral-200">Dark</span>
+                </>
+              ) : (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-500 fill-amber-500/20" />
+                  <span className="text-[11px] text-neutral-800">Light</span>
+                </>
+              )}
             </button>
 
             {/* GitHub Link */}

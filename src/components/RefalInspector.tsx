@@ -26,8 +26,8 @@ export function RefalInspector({ analysis, isDark = true }: RefalInspectorProps)
     <div
       className={`border-t backdrop-blur-md shadow-2xl transition-all duration-300 ${
         isDark
-          ? 'border-neutral-800 bg-neutral-950/95 text-neutral-100'
-          : 'border-neutral-200 bg-white/95 text-neutral-900 shadow-neutral-300/30'
+          ? 'border-neutral-800 bg-[#050505] text-neutral-100'
+          : 'border-neutral-200 bg-white text-neutral-900 shadow-neutral-300/30'
       }`}
     >
       {/* Summary Header Bar */}

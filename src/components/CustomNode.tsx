@@ -64,7 +64,7 @@ export const CustomNode = memo(({ data }: CustomNodeProps) => {
         isEliminated
           ? 'opacity-40 scale-95 grayscale border-neutral-400 dark:border-neutral-700'
           : `hover:scale-102 hover:shadow-2xl border-neutral-300 dark:border-neutral-800 ${config.glow}`
-      } bg-white dark:bg-neutral-900/95 text-neutral-900 dark:text-neutral-100`}
+      } bg-white dark:bg-[#0d0d10] text-neutral-900 dark:text-neutral-100 shadow-sm dark:shadow-2xl`}
     >
       <Handle
         type="target"

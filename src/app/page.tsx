@@ -46,25 +46,46 @@ export default function Home() {
 
   const isDark = theme === 'dark';
 
-  // Synchronize Theme class on root document
+  // Load saved theme preference on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('superflow-theme') as 'dark' | 'light' | null;
+    if (saved === 'dark' || saved === 'light') {
+      setTheme(saved);
+    }
+  }, []);
+
+  // Synchronize Theme class on root document and body
   useEffect(() => {
     const root = document.documentElement;
+    const body = document.body;
     if (theme === 'dark') {
       root.classList.add('dark');
       root.classList.remove('light');
+      body.classList.add('dark');
+      body.classList.remove('light');
+      body.style.backgroundColor = '#050505';
+      body.style.color = '#f3f4f6';
     } else {
       root.classList.add('light');
       root.classList.remove('dark');
+      body.classList.add('light');
+      body.classList.remove('dark');
+      body.style.backgroundColor = '#ffffff';
+      body.style.color = '#0a0a0a';
     }
   }, [theme]);
 
   // Toggle Theme
   const handleToggleTheme = () => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    setTheme((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('superflow-theme', next);
+      return next;
+    });
   };
 
   // Initialize graph
-  const loadGraph = useCallback((graph: ArchitectureGraph, supercompiled: boolean, currentTheme: 'dark' | 'light') => {
+  const loadGraph = useCallback((graph: ArchitectureGraph, supercompiled: boolean) => {
     const { supercompiledGraph, analysis } = supercompileGraph(graph);
     setAnalysisResult(analysis);
 
@@ -77,20 +98,30 @@ export default function Home() {
       data: n.data,
     }));
 
-    // Ensure ALL edges have dynamic moving animated connection across the entire flow
+    // Ensure ALL edges have dynamic animated moving connection pulses across the entire flow
     const formattedEdges: Edge<ArchitectureEdgeData>[] = targetGraph.edges.map((e) => ({
       id: e.id,
       source: e.source,
       target: e.target,
-      animated: true, // Guarantees animated pulse on every single connection
       type: 'default',
+      animated: true,
       data: e.data,
       label: e.data?.label,
       labelStyle: {
-        fill: currentTheme === 'dark' ? '#cbd5e1' : '#334155',
+        fill: isDark ? '#34d399' : '#047857',
         fontSize: 10,
         fontFamily: 'monospace',
-        fontWeight: 600,
+        fontWeight: 700,
+      },
+      labelBgStyle: {
+        fill: isDark ? '#141414' : '#f8fafc',
+        fillOpacity: 0.95,
+      },
+      labelBgPadding: [6, 3] as [number, number],
+      labelBgBorderRadius: 8,
+      style: {
+        stroke: isDark ? '#10b981' : '#059669',
+        strokeWidth: 2.5,
       },
     }));
 
@@ -98,10 +129,10 @@ export default function Home() {
     setEdges(formattedEdges);
   }, [setNodes, setEdges]);
 
-  // Initial load
+  // Initial load and reload when graph changes
   useEffect(() => {
-    loadGraph(activeGraph, isSupercompiledView, theme);
-  }, [theme]);
+    loadGraph(activeGraph, isSupercompiledView);
+  }, [activeGraph, isSupercompiledView, loadGraph]);
 
   // Handle Preset Switching
   const handleSelectPreset = (presetId: string) => {
@@ -110,7 +141,7 @@ export default function Home() {
     setActiveGraph(selected);
     setPromptInput(selected.spokenPrompt);
     setIsSupercompiledView(false);
-    loadGraph(selected, false, theme);
+    loadGraph(selected, false);
   };
 
   // Run Supercompilation & Metasystem Transition
@@ -121,30 +152,30 @@ export default function Home() {
       const { supercompiledGraph, analysis } = supercompileGraph(activeGraph);
       setAnalysisResult(analysis);
       setIsSupercompiledView(true);
-      loadGraph(activeGraph, true, theme);
+      loadGraph(activeGraph, true);
       setIsProcessing(false);
 
       // Trigger Celebration
       confetti({
-        particleCount: 80,
-        spread: 70,
+        particleCount: 90,
+        spread: 75,
         origin: { y: 0.8 },
         colors: ['#10b981', '#34d399', '#6ee7b7'],
       });
-    }, 500);
+    }, 450);
   };
 
   // Toggle View
   const handleToggleView = () => {
     const nextView = !isSupercompiledView;
     setIsSupercompiledView(nextView);
-    loadGraph(activeGraph, nextView, theme);
+    loadGraph(activeGraph, nextView);
   };
 
   // Reset to original
   const handleReset = () => {
     setIsSupercompiledView(false);
-    loadGraph(activeGraph, false, theme);
+    loadGraph(activeGraph, false);
   };
 
   // Handle Node Click to Expand into Detail Modal
@@ -155,8 +186,9 @@ export default function Home() {
   return (
     <div
       className={`flex flex-col h-screen w-screen overflow-hidden font-sans transition-colors duration-200 ${
-        isDark ? 'dark bg-neutral-950 text-neutral-100' : 'light bg-white text-neutral-900'
+        isDark ? 'dark bg-[#050505] text-neutral-100' : 'light bg-white text-neutral-900'
       }`}
+      style={{ backgroundColor: isDark ? '#050505' : '#ffffff' }}
     >
       {/* Voice Dictation Bar */}
       <VoiceInputBar
@@ -177,15 +209,21 @@ export default function Home() {
       {/* Main Graph Canvas Area */}
       <div
         className={`flex-1 relative w-full select-none transition-colors duration-200 ${
-          isDark ? 'bg-neutral-950' : 'bg-white'
+          isDark ? 'bg-[#050505]' : 'bg-white'
         }`}
-        style={{ minHeight: '520px', height: 'calc(100vh - 165px)' }}
+        style={{
+          minHeight: '520px',
+          height: 'calc(100vh - 165px)',
+          backgroundColor: isDark ? '#050505' : '#ffffff',
+        }}
       >
         {/* Floating Header Tag */}
         <div className="absolute top-4 left-4 z-10 pointer-events-none">
           <div
             className={`border rounded-xl px-4 py-2.5 backdrop-blur-md shadow-xl transition-colors ${
-              isDark ? 'bg-neutral-900/90 border-neutral-800 text-neutral-100' : 'bg-white/95 border-neutral-200 text-neutral-900 shadow-md'
+              isDark
+                ? 'bg-neutral-900/90 border-neutral-800 text-neutral-100'
+                : 'bg-white/95 border-neutral-200 text-neutral-900 shadow-md'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -216,8 +254,9 @@ export default function Home() {
           onEdgesChange={onEdgesChange}
           onNodeClick={handleNodeClick}
           nodeTypes={nodeTypes}
+          colorMode={theme}
           fitView
-          fitViewOptions={{ padding: 0.12 }}
+          fitViewOptions={{ padding: 0.16 }}
           zoomOnScroll={false}
           zoomOnPinch={false}
           panOnScroll={false}
@@ -225,15 +264,16 @@ export default function Home() {
           panOnDrag={true}
           nodesDraggable={true}
           nodesConnectable={false}
-          minZoom={0.5}
-          maxZoom={1.5}
+          minZoom={0.25}
+          maxZoom={2}
           proOptions={{ hideAttribution: true }}
+          style={{ backgroundColor: isDark ? '#050505' : '#ffffff' }}
         >
           <Background
             variant={BackgroundVariant.Dots}
             gap={24}
             size={1.5}
-            color={isDark ? '#262626' : '#e2e8f0'}
+            color={isDark ? '#262626' : '#cbd5e1'}
           />
           <Controls position="top-right" showInteractive={false} />
         </ReactFlow>
