@@ -137,7 +137,7 @@ export default function Home() {
       />
 
       {/* Main Graph Canvas Area */}
-      <div className="flex-1 relative w-full h-full">
+      <div className="flex-1 relative w-full" style={{ minHeight: '520px', height: 'calc(100vh - 200px)' }}>
         {/* Floating Header Tag */}
         <div className="absolute top-4 left-4 z-10 pointer-events-none">
           <div className="bg-neutral-900/90 border border-neutral-800 rounded-xl px-4 py-2.5 backdrop-blur-md shadow-lg">
