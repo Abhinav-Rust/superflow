@@ -5,7 +5,6 @@ import {
   ReactFlow,
   Background,
   Controls,
-  MiniMap,
   useNodesState,
   useEdgesState,
   BackgroundVariant,
@@ -134,15 +133,16 @@ export default function Home() {
         isSupercompiled={isSupercompiledView}
         onToggleSupercompileView={handleToggleView}
         isProcessing={isProcessing}
+        currentPresetId={currentPresetId}
       />
 
       {/* Main Graph Canvas Area */}
-      <div className="flex-1 relative w-full" style={{ minHeight: '520px', height: 'calc(100vh - 200px)' }}>
+      <div className="flex-1 relative w-full select-none" style={{ minHeight: '520px', height: 'calc(100vh - 165px)' }}>
         {/* Floating Header Tag */}
         <div className="absolute top-4 left-4 z-10 pointer-events-none">
-          <div className="bg-neutral-900/90 border border-neutral-800 rounded-xl px-4 py-2.5 backdrop-blur-md shadow-lg">
+          <div className="bg-neutral-900/90 border border-neutral-800/90 rounded-xl px-4 py-2.5 backdrop-blur-md shadow-2xl">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-neutral-100">{activeGraph.name}</span>
+              <span className="text-sm font-bold text-neutral-100 font-mono tracking-tight">{activeGraph.name}</span>
               <span
                 className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${
                   isSupercompiledView
@@ -165,24 +165,20 @@ export default function Home() {
           onEdgesChange={onEdgesChange}
           nodeTypes={nodeTypes}
           fitView
-          fitViewOptions={{ padding: 0.2 }}
-          minZoom={0.3}
-          maxZoom={1.8}
+          fitViewOptions={{ padding: 0.15 }}
+          zoomOnScroll={false}
+          zoomOnPinch={false}
+          panOnScroll={false}
+          preventScrolling={true}
+          panOnDrag={true}
+          nodesDraggable={true}
+          nodesConnectable={false}
+          minZoom={0.5}
+          maxZoom={1.5}
+          proOptions={{ hideAttribution: true }}
         >
           <Background variant={BackgroundVariant.Dots} gap={24} size={1.5} color="#262626" />
-          <Controls position="top-right" />
-          <MiniMap
-            nodeColor={(n) => {
-              if (n.data?.isEliminatedBySupercompile) return '#737373';
-              if (n.type === 'gateway') return '#3b82f6';
-              if (n.type === 'queue') return '#f59e0b';
-              if (n.type === 'service') return '#8b5cf6';
-              if (n.type === 'invariant') return '#10b981';
-              if (n.type === 'database') return '#f43f5e';
-              return '#525252';
-            }}
-            position="bottom-right"
-          />
+          <Controls position="top-right" showInteractive={false} />
         </ReactFlow>
       </div>
 

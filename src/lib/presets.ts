@@ -11,7 +11,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'otel-gateway',
         type: 'gateway',
-        position: { x: 50, y: 180 },
+        position: { x: 50, y: 160 },
         data: {
           label: 'Telemetry Ingestion Gateway',
           type: 'gateway',
@@ -24,7 +24,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'log-buffer-queue',
         type: 'queue',
-        position: { x: 300, y: 180 },
+        position: { x: 420, y: 160 },
         data: {
           label: 'Transient Log Buffer',
           type: 'queue',
@@ -38,7 +38,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'causal-engine',
         type: 'service',
-        position: { x: 550, y: 180 },
+        position: { x: 790, y: 160 },
         data: {
           label: 'Causal State DAG Engine',
           type: 'service',
@@ -51,7 +51,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'safety-invariant-gate',
         type: 'invariant',
-        position: { x: 800, y: 100 },
+        position: { x: 1160, y: 40 },
         data: {
           label: 'Turchin Invariant Safety Gate',
           type: 'invariant',
@@ -64,7 +64,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'incident-vector-db',
         type: 'database',
-        position: { x: 800, y: 280 },
+        position: { x: 1160, y: 300 },
         data: {
           label: 'Incident Vector Store',
           type: 'database',
@@ -77,7 +77,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'mitigation-dispatcher',
         type: 'service',
-        position: { x: 1080, y: 180 },
+        position: { x: 1540, y: 160 },
         data: {
           label: 'Mitigation Dispatcher',
           type: 'service',
@@ -136,7 +136,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'feed-handler',
         type: 'gateway',
-        position: { x: 50, y: 180 },
+        position: { x: 50, y: 160 },
         data: {
           label: 'L3 Feed Handler (ITCH/OUCH)',
           type: 'gateway',
@@ -149,11 +149,11 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'staging-queue',
         type: 'queue',
-        position: { x: 300, y: 180 },
+        position: { x: 420, y: 160 },
         data: {
           label: 'Staging Ring Buffer',
           type: 'queue',
-          description: 'Inter-thread lock-free SPSC ring buffer.',
+          description: 'Inter-thread lock-free SPSC ring buffer for tick buffering.',
           refalTerm: 'LockFreeRing (Slots 65536)',
           isInlined: true,
           metrics: { latency: '850ns' },
@@ -163,7 +163,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'signal-engine',
         type: 'service',
-        position: { x: 550, y: 180 },
+        position: { x: 790, y: 160 },
         data: {
           label: 'Microstructure Signal Core',
           type: 'service',
@@ -176,7 +176,7 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
       {
         id: 'risk-invariant-gate',
         type: 'invariant',
-        position: { x: 800, y: 100 },
+        position: { x: 1160, y: 40 },
         data: {
           label: 'Synchronous Risk Invariant Gate',
           type: 'invariant',
@@ -187,22 +187,9 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
         },
       },
       {
-        id: 'dma-router',
-        type: 'service',
-        position: { x: 1080, y: 180 },
-        data: {
-          label: 'DMA Exchange Router',
-          type: 'service',
-          description: 'Direct Market Access order dispatch using client_order_id for idempotency.',
-          refalTerm: 'OrderRouter (Destinations e.Exchanges)',
-          metrics: { latency: '950ns' },
-          invariants: ['Idempotent order placement', 'Atomic cancellation safety'],
-        },
-      },
-      {
         id: 'fill-ledger',
         type: 'database',
-        position: { x: 800, y: 280 },
+        position: { x: 1160, y: 300 },
         data: {
           label: 'Fill & Position Ledger',
           type: 'database',
@@ -210,6 +197,19 @@ export const ARCHITECTURE_PRESETS: ArchitectureGraph[] = [
           refalTerm: 'PositionLedger (Accounts e.Balances)',
           metrics: { latency: '2.1us' },
           invariants: ['Reconciled periodically against exchange REST'],
+        },
+      },
+      {
+        id: 'dma-router',
+        type: 'service',
+        position: { x: 1540, y: 160 },
+        data: {
+          label: 'DMA Exchange Router',
+          type: 'service',
+          description: 'Direct Market Access order dispatch using client_order_id for idempotency.',
+          refalTerm: 'OrderRouter (Destinations e.Exchanges)',
+          metrics: { latency: '950ns' },
+          invariants: ['Idempotent order placement', 'Atomic cancellation safety'],
         },
       },
     ],

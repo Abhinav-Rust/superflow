@@ -30,4 +30,5 @@ declare module 'lucide-react' {
   export const Download: LucideIcon;
   export const FileCode: LucideIcon;
   export const CheckCircle2: LucideIcon;
+  export const Github: LucideIcon;
 }
