@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   ReactFlow,
   Background,
@@ -19,7 +19,7 @@ import { CustomNode } from '@/components/CustomNode';
 import { VoiceInputBar } from '@/components/VoiceInputBar';
 import { RefalInspector } from '@/components/RefalInspector';
 import { BlueprintModal } from '@/components/BlueprintModal';
-import { Sparkles, Terminal } from 'lucide-react';
+import { NodeDetailModal } from '@/components/NodeDetailModal';
 
 const nodeTypes = {
   gateway: CustomNode,
@@ -30,6 +30,7 @@ const nodeTypes = {
 };
 
 export default function Home() {
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [currentPresetId, setCurrentPresetId] = useState<string>('opspulse-incident-triage');
   const [activeGraph, setActiveGraph] = useState<ArchitectureGraph>(ARCHITECTURE_PRESETS[0]);
   const [isSupercompiledView, setIsSupercompiledView] = useState<boolean>(false);
@@ -37,13 +38,21 @@ export default function Home() {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [promptInput, setPromptInput] = useState<string>(ARCHITECTURE_PRESETS[0].spokenPrompt);
   const [isBlueprintOpen, setIsBlueprintOpen] = useState<boolean>(false);
+  const [selectedNodeData, setSelectedNodeData] = useState<ArchitectureNodeData | null>(null);
 
   // React Flow state
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<ArchitectureNodeData>>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge<ArchitectureEdgeData>>([]);
 
+  const isDark = theme === 'dark';
+
+  // Toggle Theme
+  const handleToggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
   // Initialize graph
-  const loadGraph = useCallback((graph: ArchitectureGraph, supercompiled: boolean) => {
+  const loadGraph = useCallback((graph: ArchitectureGraph, supercompiled: boolean, currentTheme: 'dark' | 'light') => {
     const { supercompiledGraph, analysis } = supercompileGraph(graph);
     setAnalysisResult(analysis);
 
@@ -56,15 +65,20 @@ export default function Home() {
       data: n.data,
     }));
 
+    const edgeColor = currentTheme === 'dark' ? '#10b981' : '#059669';
+
+    // Ensure ALL edges have lively animated marching connection
     const formattedEdges: Edge<ArchitectureEdgeData>[] = targetGraph.edges.map((e) => ({
       id: e.id,
       source: e.source,
       target: e.target,
-      animated: e.animated ?? true,
-      style: e.style || { stroke: '#6366f1', strokeWidth: 2 },
+      animated: true, // Lively animated moving pulse on ALL connections
+      style: e.data?.isSupercompiled
+        ? { stroke: '#10b981', strokeWidth: 3, strokeDasharray: '6 4' }
+        : { stroke: edgeColor, strokeWidth: 2.5, strokeDasharray: '5 5' },
       data: e.data,
       label: e.data?.label,
-      labelStyle: { fill: '#cbd5e1', fontSize: 10, fontFamily: 'monospace' },
+      labelStyle: { fill: currentTheme === 'dark' ? '#cbd5e1' : '#475569', fontSize: 10, fontFamily: 'monospace' },
     }));
 
     setNodes(formattedNodes);
@@ -73,8 +87,8 @@ export default function Home() {
 
   // Initial load
   useEffect(() => {
-    loadGraph(activeGraph, isSupercompiledView);
-  }, []);
+    loadGraph(activeGraph, isSupercompiledView, theme);
+  }, [theme]);
 
   // Handle Preset Switching
   const handleSelectPreset = (presetId: string) => {
@@ -83,7 +97,7 @@ export default function Home() {
     setActiveGraph(selected);
     setPromptInput(selected.spokenPrompt);
     setIsSupercompiledView(false);
-    loadGraph(selected, false);
+    loadGraph(selected, false, theme);
   };
 
   // Run Supercompilation & Metasystem Transition
@@ -94,7 +108,7 @@ export default function Home() {
       const { supercompiledGraph, analysis } = supercompileGraph(activeGraph);
       setAnalysisResult(analysis);
       setIsSupercompiledView(true);
-      loadGraph(activeGraph, true);
+      loadGraph(activeGraph, true, theme);
       setIsProcessing(false);
 
       // Trigger Celebration
@@ -104,24 +118,33 @@ export default function Home() {
         origin: { y: 0.8 },
         colors: ['#10b981', '#34d399', '#6ee7b7'],
       });
-    }, 600);
+    }, 500);
   };
 
   // Toggle View
   const handleToggleView = () => {
     const nextView = !isSupercompiledView;
     setIsSupercompiledView(nextView);
-    loadGraph(activeGraph, nextView);
+    loadGraph(activeGraph, nextView, theme);
   };
 
   // Reset to original
   const handleReset = () => {
     setIsSupercompiledView(false);
-    loadGraph(activeGraph, false);
+    loadGraph(activeGraph, false, theme);
+  };
+
+  // Handle Node Click to Expand into Detail Modal
+  const handleNodeClick = (_: React.MouseEvent, node: Node<ArchitectureNodeData>) => {
+    setSelectedNodeData(node.data);
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-neutral-950 text-neutral-100 overflow-hidden font-sans">
+    <div
+      className={`flex flex-col h-screen w-screen overflow-hidden font-sans transition-colors duration-200 ${
+        isDark ? 'bg-neutral-950 text-neutral-100' : 'bg-slate-50 text-neutral-900'
+      }`}
+    >
       {/* Voice Dictation Bar */}
       <VoiceInputBar
         promptText={promptInput}
@@ -134,26 +157,36 @@ export default function Home() {
         onToggleSupercompileView={handleToggleView}
         isProcessing={isProcessing}
         currentPresetId={currentPresetId}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
       />
 
       {/* Main Graph Canvas Area */}
       <div className="flex-1 relative w-full select-none" style={{ minHeight: '520px', height: 'calc(100vh - 165px)' }}>
         {/* Floating Header Tag */}
         <div className="absolute top-4 left-4 z-10 pointer-events-none">
-          <div className="bg-neutral-900/90 border border-neutral-800/90 rounded-xl px-4 py-2.5 backdrop-blur-md shadow-2xl">
+          <div
+            className={`border rounded-xl px-4 py-2.5 backdrop-blur-md shadow-xl transition-colors ${
+              isDark ? 'bg-neutral-900/90 border-neutral-800 text-neutral-100' : 'bg-white/90 border-neutral-200 text-neutral-900'
+            }`}
+          >
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-neutral-100 font-mono tracking-tight">{activeGraph.name}</span>
+              <span className="text-sm font-bold font-mono tracking-tight">{activeGraph.name}</span>
               <span
                 className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${
                   isSupercompiledView
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                    : 'bg-neutral-800 text-neutral-400 border border-neutral-700'
+                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                    : isDark
+                    ? 'bg-neutral-800 text-neutral-400 border border-neutral-700'
+                    : 'bg-neutral-100 text-neutral-600 border border-neutral-300'
                 }`}
               >
                 {isSupercompiledView ? '⚡ SUPERCOMPILED RESIDUAL' : 'RAW SPOKEN TOPOLOGY'}
               </span>
             </div>
-            <p className="text-xs text-neutral-400 mt-0.5 max-w-lg truncate">{activeGraph.description}</p>
+            <p className={`text-xs mt-0.5 max-w-lg truncate ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
+              {activeGraph.description}
+            </p>
           </div>
         </div>
 
@@ -163,9 +196,10 @@ export default function Home() {
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
+          onNodeClick={handleNodeClick}
           nodeTypes={nodeTypes}
           fitView
-          fitViewOptions={{ padding: 0.15 }}
+          fitViewOptions={{ padding: 0.12 }}
           zoomOnScroll={false}
           zoomOnPinch={false}
           panOnScroll={false}
@@ -177,13 +211,27 @@ export default function Home() {
           maxZoom={1.5}
           proOptions={{ hideAttribution: true }}
         >
-          <Background variant={BackgroundVariant.Dots} gap={24} size={1.5} color="#262626" />
+          <Background
+            variant={BackgroundVariant.Dots}
+            gap={24}
+            size={1.5}
+            color={isDark ? '#262626' : '#cbd5e1'}
+          />
           <Controls position="top-right" showInteractive={false} />
         </ReactFlow>
       </div>
 
       {/* Refal Metasystem Inspector Drawer */}
-      <RefalInspector analysis={analysisResult} />
+      <RefalInspector analysis={analysisResult} isDark={isDark} />
+
+      {/* Node Detail Expansion Modal */}
+      {selectedNodeData && (
+        <NodeDetailModal
+          nodeData={selectedNodeData}
+          onClose={() => setSelectedNodeData(null)}
+          isDark={isDark}
+        />
+      )}
 
       {/* Production Blueprint Modal */}
       {isBlueprintOpen && (

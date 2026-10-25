@@ -30,5 +30,10 @@ declare module 'lucide-react' {
   export const Download: LucideIcon;
   export const FileCode: LucideIcon;
   export const CheckCircle2: LucideIcon;
-  export const Github: LucideIcon;
+  export const CheckCircle: LucideIcon;
+  export const Clock: LucideIcon;
+  export const Activity: LucideIcon;
+  export const Code: LucideIcon;
+  export const Sun: LucideIcon;
+  export const Moon: LucideIcon;
 }

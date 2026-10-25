@@ -3,7 +3,7 @@
 import React, { memo } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { ArchitectureNodeData } from '@/types/architecture';
-import { Server, Database, Layers, ShieldCheck, Radio, Zap } from 'lucide-react';
+import { Server, Database, Layers, ShieldCheck, Radio, Zap, Sparkles } from 'lucide-react';
 
 interface CustomNodeProps {
   data: ArchitectureNodeData;
@@ -51,16 +51,15 @@ const TYPE_CONFIG = {
 export const CustomNode = memo(({ data }: CustomNodeProps) => {
   const config = TYPE_CONFIG[data.type] || TYPE_CONFIG.service;
   const Icon = config.icon;
-
   const isEliminated = data.isEliminatedBySupercompile;
 
   return (
     <div
-      className={`relative min-w-[260px] max-w-[320px] rounded-xl border backdrop-blur-md bg-neutral-900/90 p-4 shadow-xl transition-all duration-300 ${
+      className={`relative min-w-[280px] max-w-[340px] rounded-2xl border backdrop-blur-xl p-4 shadow-xl transition-all duration-200 cursor-pointer group select-none ${
         isEliminated
           ? 'opacity-40 border-neutral-700 scale-95 grayscale'
-          : `${config.border} ${config.glow} hover:scale-102 hover:border-neutral-400`
-      }`}
+          : `${config.border} ${config.glow} hover:scale-102 hover:shadow-2xl hover:border-neutral-300`
+      } bg-neutral-900/95 dark:bg-neutral-900/95 text-neutral-100`}
     >
       <Handle
         type="target"
@@ -69,53 +68,48 @@ export const CustomNode = memo(({ data }: CustomNodeProps) => {
       />
 
       {/* Header */}
-      <div className="flex items-start justify-between gap-3 mb-2">
-        <div className="flex items-center gap-2">
-          <div className={`p-2 rounded-lg bg-gradient-to-br ${config.color} text-white shadow-md`}>
+      <div className="flex items-start justify-between gap-3 mb-2.5">
+        <div className="flex items-center gap-2.5">
+          <div className={`p-2 rounded-xl bg-gradient-to-br ${config.color} text-white shadow-md`}>
             <Icon className="w-4 h-4" />
           </div>
           <div>
-            <span className="text-[10px] font-mono tracking-wider font-semibold text-neutral-400 uppercase">
+            <span className="text-[10px] font-mono tracking-wider font-bold text-neutral-400 uppercase">
               {config.badge}
             </span>
-            <h3 className="text-sm font-bold text-neutral-100 leading-tight">{data.label}</h3>
+            <h3 className="text-sm font-bold text-neutral-100 leading-tight group-hover:text-emerald-400 transition">
+              {data.label}
+            </h3>
           </div>
         </div>
       </div>
 
       {/* Description */}
-      <p className="text-xs text-neutral-300 mb-3 leading-relaxed">{data.description}</p>
+      <p className="text-xs text-neutral-300 mb-3 leading-relaxed line-clamp-2">
+        {data.description}
+      </p>
 
       {/* Invariants and Refal Term */}
-      <div className="space-y-1.5 pt-2 border-t border-neutral-800/80 font-mono text-[11px]">
+      <div className="space-y-1.5 pt-2.5 border-t border-neutral-800/80 font-mono text-[11px]">
         <div className="flex items-center justify-between text-neutral-400">
           <span className="text-neutral-500">Refal Term:</span>
-          <span className="text-emerald-400 truncate max-w-[170px]" title={data.refalTerm}>
+          <span className="text-emerald-400 truncate max-w-[170px] font-semibold" title={data.refalTerm}>
             {data.refalTerm}
           </span>
         </div>
 
         {data.metrics?.latency && (
           <div className="flex items-center justify-between text-neutral-400">
-            <span className="text-neutral-500">Target Latency:</span>
+            <span className="text-neutral-500">Latency:</span>
             <span className="text-cyan-400 font-semibold">{data.metrics.latency}</span>
           </div>
         )}
+      </div>
 
-        {data.invariants && data.invariants.length > 0 && (
-          <div className="mt-2 pt-1.5 border-t border-neutral-800/50">
-            <div className="text-[10px] uppercase tracking-wide text-amber-400/90 font-semibold mb-1">
-              Guaranteed Invariants:
-            </div>
-            <ul className="list-disc list-inside text-[10px] text-neutral-300 space-y-0.5">
-              {data.invariants.map((inv, idx) => (
-                <li key={idx} className="truncate" title={inv}>
-                  {inv}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+      {/* Click hint footer */}
+      <div className="mt-2.5 pt-2 border-t border-neutral-800/60 flex items-center justify-between text-[10px] font-mono text-neutral-500 group-hover:text-neutral-300 transition">
+        <span>Click to inspect details</span>
+        <Sparkles className="w-3 h-3 text-emerald-400 opacity-60 group-hover:opacity-100" />
       </div>
 
       {/* Supercompiled Pill Overlay */}
