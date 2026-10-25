@@ -46,6 +46,18 @@ export default function Home() {
 
   const isDark = theme === 'dark';
 
+  // Synchronize Theme class on root document
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+      root.classList.remove('light');
+    } else {
+      root.classList.add('light');
+      root.classList.remove('dark');
+    }
+  }, [theme]);
+
   // Toggle Theme
   const handleToggleTheme = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
@@ -65,20 +77,21 @@ export default function Home() {
       data: n.data,
     }));
 
-    const edgeColor = currentTheme === 'dark' ? '#10b981' : '#059669';
-
-    // Ensure ALL edges have lively animated marching connection
+    // Ensure ALL edges have dynamic moving animated connection across the entire flow
     const formattedEdges: Edge<ArchitectureEdgeData>[] = targetGraph.edges.map((e) => ({
       id: e.id,
       source: e.source,
       target: e.target,
-      animated: true, // Lively animated moving pulse on ALL connections
-      style: e.data?.isSupercompiled
-        ? { stroke: '#10b981', strokeWidth: 3, strokeDasharray: '6 4' }
-        : { stroke: edgeColor, strokeWidth: 2.5, strokeDasharray: '5 5' },
+      animated: true, // Guarantees animated pulse on every single connection
+      type: 'default',
       data: e.data,
       label: e.data?.label,
-      labelStyle: { fill: currentTheme === 'dark' ? '#cbd5e1' : '#475569', fontSize: 10, fontFamily: 'monospace' },
+      labelStyle: {
+        fill: currentTheme === 'dark' ? '#cbd5e1' : '#334155',
+        fontSize: 10,
+        fontFamily: 'monospace',
+        fontWeight: 600,
+      },
     }));
 
     setNodes(formattedNodes);
@@ -142,7 +155,7 @@ export default function Home() {
   return (
     <div
       className={`flex flex-col h-screen w-screen overflow-hidden font-sans transition-colors duration-200 ${
-        isDark ? 'bg-neutral-950 text-neutral-100' : 'bg-slate-50 text-neutral-900'
+        isDark ? 'dark bg-neutral-950 text-neutral-100' : 'light bg-white text-neutral-900'
       }`}
     >
       {/* Voice Dictation Bar */}
@@ -162,12 +175,17 @@ export default function Home() {
       />
 
       {/* Main Graph Canvas Area */}
-      <div className="flex-1 relative w-full select-none" style={{ minHeight: '520px', height: 'calc(100vh - 165px)' }}>
+      <div
+        className={`flex-1 relative w-full select-none transition-colors duration-200 ${
+          isDark ? 'bg-neutral-950' : 'bg-white'
+        }`}
+        style={{ minHeight: '520px', height: 'calc(100vh - 165px)' }}
+      >
         {/* Floating Header Tag */}
         <div className="absolute top-4 left-4 z-10 pointer-events-none">
           <div
             className={`border rounded-xl px-4 py-2.5 backdrop-blur-md shadow-xl transition-colors ${
-              isDark ? 'bg-neutral-900/90 border-neutral-800 text-neutral-100' : 'bg-white/90 border-neutral-200 text-neutral-900'
+              isDark ? 'bg-neutral-900/90 border-neutral-800 text-neutral-100' : 'bg-white/95 border-neutral-200 text-neutral-900 shadow-md'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -175,16 +193,16 @@ export default function Home() {
               <span
                 className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${
                   isSupercompiledView
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                    ? 'bg-emerald-500/20 text-emerald-500 border border-emerald-500/40'
                     : isDark
                     ? 'bg-neutral-800 text-neutral-400 border border-neutral-700'
-                    : 'bg-neutral-100 text-neutral-600 border border-neutral-300'
+                    : 'bg-neutral-100 text-neutral-700 border border-neutral-300'
                 }`}
               >
                 {isSupercompiledView ? '⚡ SUPERCOMPILED RESIDUAL' : 'RAW SPOKEN TOPOLOGY'}
               </span>
             </div>
-            <p className={`text-xs mt-0.5 max-w-lg truncate ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
+            <p className={`text-xs mt-0.5 max-w-lg truncate ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
               {activeGraph.description}
             </p>
           </div>
@@ -215,7 +233,7 @@ export default function Home() {
             variant={BackgroundVariant.Dots}
             gap={24}
             size={1.5}
-            color={isDark ? '#262626' : '#cbd5e1'}
+            color={isDark ? '#262626' : '#e2e8f0'}
           />
           <Controls position="top-right" showInteractive={false} />
         </ReactFlow>

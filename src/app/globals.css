@@ -7,37 +7,82 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
   overflow-x: hidden;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
-/* React Flow Dark Canvas overrides */
-.react-flow__background {
-  background-color: #0d0d0d !important;
+/* React Flow Canvas Theme Support */
+.dark .react-flow__background {
+  background-color: #0a0a0a !important;
 }
 
-.react-flow__controls {
+.light .react-flow__background {
+  background-color: #ffffff !important;
+}
+
+/* Controls Styling */
+.dark .react-flow__controls {
   border: 1px solid #262626 !important;
   background-color: #171717 !important;
   border-radius: 0.75rem !important;
   overflow: hidden;
 }
 
-.react-flow__controls-button {
+.dark .react-flow__controls-button {
   background-color: #171717 !important;
   border-bottom: 1px solid #262626 !important;
   fill: #a3a3a3 !important;
 }
 
-.react-flow__controls-button:hover {
+.dark .react-flow__controls-button:hover {
   background-color: #262626 !important;
   fill: #ffffff !important;
 }
 
-.react-flow__minimap {
-  background-color: #141414 !important;
-  border: 1px solid #262626 !important;
+.light .react-flow__controls {
+  border: 1px solid #e2e8f0 !important;
+  background-color: #ffffff !important;
   border-radius: 0.75rem !important;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1) !important;
+}
+
+.light .react-flow__controls-button {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  fill: #475569 !important;
+}
+
+.light .react-flow__controls-button:hover {
+  background-color: #f1f5f9 !important;
+  fill: #0f172a !important;
+}
+
+/* Dynamic Moving Animation on ALL Connection Edges */
+@keyframes edgeFlowAnimation {
+  from {
+    stroke-dashoffset: 24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.react-flow__edge-path,
+.react-flow__edge path {
+  stroke-dasharray: 6 5 !important;
+  animation: edgeFlowAnimation 0.8s linear infinite !important;
+  stroke-linecap: round;
+}
+
+.dark .react-flow__edge-path,
+.dark .react-flow__edge path {
+  stroke: #10b981 !important;
+  filter: drop-shadow(0 0 3px rgba(16, 185, 129, 0.4));
+}
+
+.light .react-flow__edge-path,
+.light .react-flow__edge path {
+  stroke: #059669 !important;
+  filter: drop-shadow(0 0 2px rgba(5, 150, 105, 0.3));
 }
