@@ -42,19 +42,6 @@ SuperFlow solves this through a multi-tier cybernetic pipeline:
 
 ---
 
-## 🎙️ Built with Wispr Flow ("No Hands")
-
-SuperFlow was built and designed around **Wispr Flow** as the primary human-to-machine interface:
-* **Dictation Velocity:** 120 Words Per Minute (**Top 0.8% of all Wispr Flow users**).
-* **AI Prompting:** 77% of desktop activity dedicated to dictating high-bandwidth architecture specs and code generation prompts (858 total words dictated across 17 AI prompts).
-* **Intelligent Adaptation:** 54 automatic corrections and 18 custom dictionary fixes ensuring specialized systems terminology (Refal, invariants, Turchin, HFT) translated accurately without manual intervention.
-
-<p align="center">
-  <img src="public/wispr-flow-insights.png" alt="Wispr Flow Insights Dashboard" width="850" />
-</p>
-
----
-
 ## 🏃 Quickstart
 
 ```bash
