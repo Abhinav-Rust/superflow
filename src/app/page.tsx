@@ -39,6 +39,8 @@ export default function Home() {
   const [promptInput, setPromptInput] = useState<string>(ARCHITECTURE_PRESETS[0].spokenPrompt);
   const [isBlueprintOpen, setIsBlueprintOpen] = useState<boolean>(false);
   const [selectedNodeData, setSelectedNodeData] = useState<ArchitectureNodeData | null>(null);
+  const [isResetting, setIsResetting] = useState<boolean>(false);
+  const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
 
   // React Flow state
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<ArchitectureNodeData>>([]);
@@ -174,8 +176,21 @@ export default function Home() {
 
   // Reset to original
   const handleReset = () => {
+    setIsResetting(true);
     setIsSupercompiledView(false);
+    setPromptInput(activeGraph.spokenPrompt);
+    setSelectedNodeData(null);
     loadGraph(activeGraph, false);
+
+    if (reactFlowInstance) {
+      setTimeout(() => {
+        reactFlowInstance.fitView({ padding: 0.16, duration: 400 });
+      }, 50);
+    }
+
+    setTimeout(() => {
+      setIsResetting(false);
+    }, 600);
   };
 
   // Handle Node Click to Expand into Detail Modal
@@ -196,6 +211,7 @@ export default function Home() {
         onPromptChange={setPromptInput}
         onSupercompile={handleSupercompile}
         onReset={handleReset}
+        isResetting={isResetting}
         onOpenBlueprint={() => setIsBlueprintOpen(true)}
         onSelectPreset={handleSelectPreset}
         isSupercompiled={isSupercompiledView}
@@ -253,6 +269,7 @@ export default function Home() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onNodeClick={handleNodeClick}
+          onInit={setReactFlowInstance}
           nodeTypes={nodeTypes}
           colorMode={theme}
           fitView

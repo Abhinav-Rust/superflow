@@ -8,6 +8,7 @@ interface VoiceInputBarProps {
   onPromptChange: (text: string) => void;
   onSupercompile: () => void;
   onReset: () => void;
+  isResetting?: boolean;
   onOpenBlueprint: () => void;
   onSelectPreset: (presetId: string) => void;
   isSupercompiled: boolean;
@@ -23,6 +24,7 @@ export function VoiceInputBar({
   onPromptChange,
   onSupercompile,
   onReset,
+  isResetting = false,
   onOpenBlueprint,
   onSelectPreset,
   isSupercompiled,
@@ -288,14 +290,16 @@ export function VoiceInputBar({
           {/* Reset */}
           <button
             onClick={onReset}
-            className={`p-2.5 rounded-xl border transition shrink-0 ${
+            disabled={isResetting}
+            className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl border text-xs font-mono transition shrink-0 ${
               isDark
-                ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-neutral-400 hover:text-white'
-                : 'bg-neutral-100 hover:bg-neutral-200 border-neutral-300 text-neutral-600 hover:text-neutral-950'
+                ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-neutral-300 hover:text-white'
+                : 'bg-neutral-100 hover:bg-neutral-200 border-neutral-300 text-neutral-800 hover:text-neutral-950 font-semibold'
             }`}
-            title="Reset Topology"
+            title="Reset Topology, Layout & Prompt to Default"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
+            <RefreshCw className={`w-3.5 h-3.5 text-cyan-400 ${isResetting ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">{isResetting ? 'Resetting...' : 'Reset'}</span>
           </button>
         </div>
       </div>
