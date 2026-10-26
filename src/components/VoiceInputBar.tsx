@@ -291,10 +291,10 @@ export function VoiceInputBar({
           <button
             onClick={onReset}
             disabled={isResetting}
-            className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl border text-xs font-mono transition shrink-0 ${
+            className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl border text-xs font-mono transition-all duration-150 active:scale-90 hover:scale-105 shrink-0 shadow-sm ${
               isDark
                 ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-neutral-300 hover:text-white'
-                : 'bg-neutral-100 hover:bg-neutral-200 border-neutral-300 text-neutral-800 hover:text-neutral-950 font-semibold'
+                : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800 hover:text-slate-950 font-bold'
             }`}
             title="Reset Topology, Layout & Prompt to Default"
           >
