@@ -127,7 +127,7 @@ export default function Home() {
 
     setNodes(formattedNodes);
     setEdges(formattedEdges);
-  }, [setNodes, setEdges]);
+  }, [setNodes, setEdges, isDark]);
 
   // Initial load and reload when graph changes
   useEffect(() => {
@@ -223,7 +223,7 @@ export default function Home() {
             className={`border rounded-xl px-4 py-2.5 backdrop-blur-md shadow-xl transition-colors ${
               isDark
                 ? 'bg-neutral-900/90 border-neutral-800 text-neutral-100'
-                : 'bg-white/95 border-neutral-200 text-neutral-900 shadow-md'
+                : 'bg-white/95 border-slate-300 text-slate-950 shadow-md'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -231,16 +231,16 @@ export default function Home() {
               <span
                 className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${
                   isSupercompiledView
-                    ? 'bg-emerald-500/20 text-emerald-500 border border-emerald-500/40'
+                    ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/40'
                     : isDark
                     ? 'bg-neutral-800 text-neutral-400 border border-neutral-700'
-                    : 'bg-neutral-100 text-neutral-700 border border-neutral-300'
+                    : 'bg-slate-100 text-slate-800 border border-slate-300'
                 }`}
               >
                 {isSupercompiledView ? '⚡ SUPERCOMPILED RESIDUAL' : 'RAW SPOKEN TOPOLOGY'}
               </span>
             </div>
-            <p className={`text-xs mt-0.5 max-w-lg truncate ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+            <p className={`text-xs mt-0.5 max-w-lg truncate ${isDark ? 'text-neutral-400' : 'text-slate-700 font-medium'}`}>
               {activeGraph.description}
             </p>
           </div>

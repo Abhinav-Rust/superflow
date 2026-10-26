@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Mic, Zap, RefreshCw, FileText, Layers, Sparkles, Sun, Moon } from 'lucide-react';
 
 interface VoiceInputBarProps {
@@ -33,6 +33,56 @@ export function VoiceInputBar({
   onToggleTheme,
 }: VoiceInputBarProps) {
   const isDark = theme === 'dark';
+  const [isListening, setIsListening] = useState(false);
+
+  // Toggle voice dictation (supports browser Web Speech API & Wispr Flow active visual state)
+  const handleVoiceToggle = () => {
+    const SpeechRecognition =
+      typeof window !== 'undefined'
+        ? (window as unknown as { SpeechRecognition?: any; webkitSpeechRecognition?: any }).SpeechRecognition ||
+          (window as unknown as { SpeechRecognition?: any; webkitSpeechRecognition?: any }).webkitSpeechRecognition
+        : null;
+
+    if (SpeechRecognition) {
+      if (isListening) {
+        setIsListening(false);
+      } else {
+        try {
+          const recognition = new SpeechRecognition();
+          recognition.continuous = false;
+          recognition.interimResults = true;
+          recognition.lang = 'en-US';
+
+          setIsListening(true);
+
+          recognition.onresult = (event: any) => {
+            const transcript = Array.from(event.results)
+              .map((result: any) => result[0].transcript)
+              .join('');
+            if (transcript) {
+              onPromptChange(transcript);
+            }
+          };
+
+          recognition.onerror = () => {
+            setIsListening(false);
+          };
+
+          recognition.onend = () => {
+            setIsListening(false);
+          };
+
+          recognition.start();
+        } catch {
+          setIsListening(false);
+        }
+      }
+    } else {
+      // Visual state for Wispr Flow dictation hotkey
+      setIsListening((prev) => !prev);
+      setTimeout(() => setIsListening(false), 4000);
+    }
+  };
 
   return (
     <header
@@ -58,34 +108,38 @@ export function VoiceInputBar({
 
             <div className={`hidden sm:block h-4 w-[1px] ${isDark ? 'bg-neutral-800' : 'bg-neutral-200'}`} />
 
-            <div className={`hidden md:flex items-center gap-1.5 text-xs font-mono ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
-              <span>Neuro-Symbolic Metasystem</span>
+            <div className={`hidden md:flex items-center gap-1.5 text-xs font-mono ${isDark ? 'text-neutral-400' : 'text-neutral-600'}`}>
+              <span className="font-semibold">Neuro-Symbolic Metasystem</span>
               <span>•</span>
-              <span>Turchin Supercompilation</span>
+              <span className="font-semibold">Turchin Supercompilation</span>
             </div>
           </div>
 
           {/* Wispr Flow Status Pill & Controls */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shadow-inner">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div className={`flex items-center gap-2 px-3 py-1 rounded-full border shadow-inner ${
+              isDark 
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
+                : 'bg-emerald-50 border-emerald-300 text-emerald-800 font-bold'
+            }`}>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-xs font-mono font-medium tracking-wide">
                 Wispr Flow Voice: READY
               </span>
             </div>
 
             {/* Presets Segmented Control */}
-            <div className={`flex items-center p-0.5 rounded-lg border text-xs font-mono ${isDark ? 'bg-neutral-900 border-neutral-800' : 'bg-neutral-100 border-neutral-200'}`}>
+            <div className={`flex items-center p-0.5 rounded-lg border text-xs font-mono ${isDark ? 'bg-neutral-900 border-neutral-800' : 'bg-neutral-100 border-neutral-300'}`}>
               <button
                 onClick={() => onSelectPreset('opspulse-incident-triage')}
                 className={`px-3 py-1 rounded-md transition ${
                   currentPresetId === 'opspulse-incident-triage'
                     ? isDark
                       ? 'bg-neutral-800 text-white font-semibold shadow-sm'
-                      : 'bg-white text-neutral-900 font-semibold shadow-sm'
+                      : 'bg-white text-neutral-950 font-bold shadow-sm'
                     : isDark
                     ? 'text-neutral-400 hover:text-neutral-200'
-                    : 'text-neutral-600 hover:text-neutral-900'
+                    : 'text-neutral-600 hover:text-neutral-950'
                 }`}
               >
                 Cloud Triage (OpsPulse)
@@ -96,10 +150,10 @@ export function VoiceInputBar({
                   currentPresetId === 'hft-order-flow'
                     ? isDark
                       ? 'bg-neutral-800 text-white font-semibold shadow-sm'
-                      : 'bg-white text-neutral-900 font-semibold shadow-sm'
+                      : 'bg-white text-neutral-950 font-bold shadow-sm'
                     : isDark
                     ? 'text-neutral-400 hover:text-neutral-200'
-                    : 'text-neutral-600 hover:text-neutral-900'
+                    : 'text-neutral-600 hover:text-neutral-950'
                 }`}
               >
                 HFT Order-Flow
@@ -124,7 +178,7 @@ export function VoiceInputBar({
               ) : (
                 <>
                   <Sun className="w-3.5 h-3.5 text-amber-500 fill-amber-500/20" />
-                  <span className="text-[11px] text-neutral-800">Light</span>
+                  <span className="text-[11px] text-neutral-800 font-bold">Light</span>
                 </>
               )}
             </button>
@@ -137,7 +191,7 @@ export function VoiceInputBar({
               className={`p-1.5 rounded-lg border transition ${
                 isDark
                   ? 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-800'
-                  : 'bg-neutral-100 border-neutral-200 text-neutral-600 hover:text-neutral-950 hover:bg-neutral-200'
+                  : 'bg-neutral-100 border-neutral-300 text-neutral-700 hover:text-neutral-950 hover:bg-neutral-200'
               }`}
               title="View on GitHub"
             >
@@ -149,88 +203,100 @@ export function VoiceInputBar({
         </div>
 
         {/* Input Bar & Action Buttons */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
+          {/* Main Voice Prompt Input Bar */}
           <div className="relative flex-1">
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-              <Mic className="w-4 h-4 text-emerald-400" />
+              <Mic className={`w-4 h-4 ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`} />
             </div>
             <input
               type="text"
               value={promptText}
               onChange={(e) => onPromptChange(e.target.value)}
               placeholder="Dictate your architecture via Wispr Flow (e.g. 'Build an event-driven payment engine with fraud checks, dead-letter retries, and invariant gates')..."
-              className={`w-full pl-10 pr-28 py-2.5 rounded-xl text-xs placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 shadow-inner font-sans transition border ${
+              className={`w-full pl-10 pr-4 py-2.5 rounded-xl text-xs placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-sans transition border shadow-inner ${
                 isDark
                   ? 'bg-neutral-900/90 border-neutral-700/80 text-neutral-100'
-                  : 'bg-neutral-50 border-neutral-300 text-neutral-900'
+                  : 'bg-white border-slate-300 text-slate-900 font-medium'
               }`}
             />
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-[11px] font-mono text-neutral-500">
-              Hold Wispr Key & Speak
-            </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2 shrink-0">
-            {/* Supercompile Action Button */}
-            <button
-              onClick={onSupercompile}
-              disabled={isProcessing}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-200 ${
-                isSupercompiled
-                  ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/30 ring-1 ring-emerald-400/40'
-                  : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-neutral-950 font-extrabold shadow-lg shadow-emerald-500/20'
-              }`}
-            >
-              <Zap className="w-4 h-4 fill-current" />
-              <span>{isProcessing ? 'Driving...' : 'Supercompile & Verify'}</span>
-            </button>
+          {/* Dedicated 'Hold Wispr & Speak' Button */}
+          <button
+            type="button"
+            onClick={handleVoiceToggle}
+            className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl font-mono text-xs font-bold transition-all duration-200 border shrink-0 shadow-sm ${
+              isListening
+                ? 'bg-rose-500/20 border-rose-500 text-rose-500 animate-pulse ring-2 ring-rose-500/30'
+                : isDark
+                ? 'bg-neutral-900 hover:bg-neutral-800 border-emerald-500/40 text-emerald-400 hover:border-emerald-400 shadow-emerald-950/20'
+                : 'bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-900 hover:border-emerald-500'
+            }`}
+            title="Click to dictate or hold your Wispr Flow hotkey"
+          >
+            <Mic className={`w-4 h-4 ${isListening ? 'text-rose-500 animate-bounce' : isDark ? 'text-emerald-400' : 'text-emerald-700'}`} />
+            <span>{isListening ? 'Listening...' : 'Hold Wispr & Speak'}</span>
+          </button>
 
-            {/* Toggle Graph Mode */}
-            <button
-              onClick={onToggleSupercompileView}
-              className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl border text-xs font-mono transition ${
-                isSupercompiled
-                  ? 'bg-amber-500/10 border-amber-500/30 text-amber-300'
-                  : isDark
-                  ? 'bg-neutral-900 border-neutral-800 text-neutral-300 hover:bg-neutral-800'
-                  : 'bg-neutral-100 border-neutral-300 text-neutral-700 hover:bg-neutral-200'
-              }`}
-              title="Toggle between raw spoken graph and supercompiled minimal graph"
-            >
-              <Layers className="w-3.5 h-3.5 text-amber-400" />
-              <span className="hidden lg:inline">
-                {isSupercompiled ? 'Residual View' : 'Spoken View'}
-              </span>
-            </button>
+          {/* Supercompile Action Button */}
+          <button
+            onClick={onSupercompile}
+            disabled={isProcessing}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-200 shrink-0 ${
+              isSupercompiled
+                ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/30 ring-1 ring-emerald-400/40'
+                : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-neutral-950 font-extrabold shadow-lg shadow-emerald-500/20'
+            }`}
+          >
+            <Zap className="w-4 h-4 fill-current" />
+            <span>{isProcessing ? 'Driving...' : 'Supercompile & Verify'}</span>
+          </button>
 
-            {/* Blueprint Export */}
-            <button
-              onClick={onOpenBlueprint}
-              className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl border text-xs font-mono transition ${
-                isDark
-                  ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-neutral-200'
-                  : 'bg-neutral-100 hover:bg-neutral-200 border-neutral-300 text-neutral-800'
-              }`}
-              title="Export Production Blueprint"
-            >
-              <FileText className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="hidden sm:inline">Blueprint</span>
-            </button>
+          {/* Toggle Graph Mode */}
+          <button
+            onClick={onToggleSupercompileView}
+            className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl border text-xs font-mono transition shrink-0 ${
+              isSupercompiled
+                ? 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+                : isDark
+                ? 'bg-neutral-900 border-neutral-800 text-neutral-300 hover:bg-neutral-800'
+                : 'bg-neutral-100 border-neutral-300 text-neutral-700 hover:bg-neutral-200'
+            }`}
+            title="Toggle between raw spoken graph and supercompiled minimal graph"
+          >
+            <Layers className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden lg:inline">
+              {isSupercompiled ? 'Residual View' : 'Spoken View'}
+            </span>
+          </button>
 
-            {/* Reset */}
-            <button
-              onClick={onReset}
-              className={`p-2.5 rounded-xl border transition ${
-                isDark
-                  ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-neutral-400 hover:text-white'
-                  : 'bg-neutral-100 hover:bg-neutral-200 border-neutral-300 text-neutral-600 hover:text-neutral-900'
-              }`}
-              title="Reset Topology"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-            </button>
-          </div>
+          {/* Blueprint Export */}
+          <button
+            onClick={onOpenBlueprint}
+            className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl border text-xs font-mono transition shrink-0 ${
+              isDark
+                ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-neutral-200'
+                : 'bg-neutral-100 hover:bg-neutral-200 border-neutral-300 text-neutral-800 font-semibold'
+            }`}
+            title="Export Production Blueprint"
+          >
+            <FileText className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="hidden sm:inline">Blueprint</span>
+          </button>
+
+          {/* Reset */}
+          <button
+            onClick={onReset}
+            className={`p-2.5 rounded-xl border transition shrink-0 ${
+              isDark
+                ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-neutral-400 hover:text-white'
+                : 'bg-neutral-100 hover:bg-neutral-200 border-neutral-300 text-neutral-600 hover:text-neutral-950'
+            }`}
+            title="Reset Topology"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
     </header>

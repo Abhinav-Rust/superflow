@@ -38,14 +38,14 @@ export function RefalInspector({ analysis, isDark = true }: RefalInspectorProps)
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className={`text-xs font-mono font-bold uppercase tracking-wide ${isDark ? 'text-neutral-100' : 'text-neutral-900'}`}>
+              <span className={`text-xs font-mono font-bold uppercase tracking-wide ${isDark ? 'text-neutral-100' : 'text-slate-900'}`}>
                 REFAL-SUPERSYSTEM (Rust Engine)
               </span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-500 dark:text-emerald-400 border border-emerald-500/30 font-bold">
                 Layer 2 Driving: PASS
               </span>
             </div>
-            <p className={`text-[11px] font-sans ${isDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+            <p className={`text-[11px] font-sans ${isDark ? 'text-neutral-400' : 'text-slate-700 font-medium'}`}>
               Valentin Turchin Metasystem Transition: {analysis.initialStepCount} ➔ {analysis.supercompiledStepCount} steps ({analysis.improvementPercentage}% speedup)
             </p>
           </div>
@@ -54,18 +54,18 @@ export function RefalInspector({ analysis, isDark = true }: RefalInspectorProps)
         {/* Quick Metrics */}
         <div className="flex items-center gap-4 text-xs font-mono">
           <div className="flex items-center gap-1.5">
-            <span className={isDark ? 'text-neutral-500' : 'text-neutral-400'}>Eliminated:</span>
-            <span className="text-amber-400 font-bold">{analysis.eliminatedNodeCount} layers</span>
+            <span className={isDark ? 'text-neutral-500' : 'text-slate-600 font-semibold'}>Eliminated:</span>
+            <span className="text-amber-600 dark:text-amber-400 font-bold">{analysis.eliminatedNodeCount} layers</span>
           </div>
 
           <div className="flex items-center gap-1.5">
-            <span className={isDark ? 'text-neutral-500' : 'text-neutral-400'}>Reachability:</span>
-            <span className="text-emerald-400 font-bold">100% Proven</span>
+            <span className={isDark ? 'text-neutral-500' : 'text-slate-600 font-semibold'}>Reachability:</span>
+            <span className="text-emerald-700 dark:text-emerald-400 font-bold">100% Proven</span>
           </div>
 
           <div className="flex items-center gap-1.5">
-            <span className={isDark ? 'text-neutral-500' : 'text-neutral-400'}>Cyclic Deadlocks:</span>
-            <span className={analysis.cyclicDeadlocksDetected ? 'text-rose-400 font-bold' : 'text-emerald-400 font-bold'}>
+            <span className={isDark ? 'text-neutral-500' : 'text-slate-600 font-semibold'}>Cyclic Deadlocks:</span>
+            <span className={analysis.cyclicDeadlocksDetected ? 'text-rose-600 dark:text-rose-400 font-bold' : 'text-emerald-700 dark:text-emerald-400 font-bold'}>
               {analysis.cyclicDeadlocksDetected ? 'DETECTED' : 'NONE'}
             </span>
           </div>
@@ -75,7 +75,7 @@ export function RefalInspector({ analysis, isDark = true }: RefalInspectorProps)
             className={`flex items-center gap-1 px-3 py-1.5 rounded-lg border text-xs font-mono transition ${
               isDark
                 ? 'bg-neutral-900 border-neutral-800 hover:bg-neutral-800 text-neutral-300'
-                : 'bg-neutral-100 border-neutral-300 hover:bg-neutral-200 text-neutral-800'
+                : 'bg-slate-100 border-slate-300 hover:bg-slate-200 text-slate-900 font-bold'
             }`}
           >
             <Terminal className="w-3.5 h-3.5 text-emerald-400" />
@@ -92,30 +92,30 @@ export function RefalInspector({ analysis, isDark = true }: RefalInspectorProps)
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setActiveTab('log')}
-                className={`px-3 py-1 rounded-md text-xs font-mono transition ${
+                className={`px-3 py-1 rounded-md text-xs font-mono transition font-bold ${
                   activeTab === 'log'
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                    : isDark ? 'text-neutral-400 hover:text-neutral-200' : 'text-neutral-600 hover:text-neutral-900'
+                    ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/40'
+                    : isDark ? 'text-neutral-400 hover:text-neutral-200' : 'text-slate-700 hover:text-slate-950 font-medium'
                 }`}
               >
                 Metasystem Proof Log
               </button>
               <button
                 onClick={() => setActiveTab('refal')}
-                className={`px-3 py-1 rounded-md text-xs font-mono transition ${
+                className={`px-3 py-1 rounded-md text-xs font-mono transition font-bold ${
                   activeTab === 'refal'
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                    : isDark ? 'text-neutral-400 hover:text-neutral-200' : 'text-neutral-600 hover:text-neutral-900'
+                    ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/40'
+                    : isDark ? 'text-neutral-400 hover:text-neutral-200' : 'text-slate-700 hover:text-slate-950 font-medium'
                 }`}
               >
                 Refal-5 Source Specification
               </button>
               <button
                 onClick={() => setActiveTab('residual')}
-                className={`px-3 py-1 rounded-md text-xs font-mono transition ${
+                className={`px-3 py-1 rounded-md text-xs font-mono transition font-bold ${
                   activeTab === 'residual'
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                    : isDark ? 'text-neutral-400 hover:text-neutral-200' : 'text-neutral-600 hover:text-neutral-900'
+                    ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/40'
+                    : isDark ? 'text-neutral-400 hover:text-neutral-200' : 'text-slate-700 hover:text-slate-950 font-medium'
                 }`}
               >
                 Supercompiled Residual Code
@@ -132,7 +132,7 @@ export function RefalInspector({ analysis, isDark = true }: RefalInspectorProps)
                     : analysis.supercompiledResidual
                 )
               }
-              className={`flex items-center gap-1 text-xs font-mono ${isDark ? 'text-neutral-400 hover:text-neutral-200' : 'text-neutral-600 hover:text-neutral-900'}`}
+              className={`flex items-center gap-1 text-xs font-mono ${isDark ? 'text-neutral-400 hover:text-neutral-200' : 'text-slate-700 hover:text-slate-950 font-bold'}`}
             >
               {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? 'Copied!' : 'Copy Code'}</span>
