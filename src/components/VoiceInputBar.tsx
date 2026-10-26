@@ -287,19 +287,18 @@ export function VoiceInputBar({
             <span className="hidden sm:inline">Blueprint</span>
           </button>
 
-          {/* Reset */}
+          {/* Reset Icon Button (Symbol Only) */}
           <button
             onClick={onReset}
             disabled={isResetting}
-            className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl border text-xs font-mono transition-all duration-150 active:scale-90 hover:scale-105 shrink-0 shadow-sm ${
+            className={`p-2.5 rounded-xl border transition-all duration-200 active:scale-80 hover:scale-110 shrink-0 ${
               isDark
-                ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-neutral-300 hover:text-white'
-                : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800 hover:text-slate-950 font-bold'
+                ? 'bg-neutral-900 hover:bg-neutral-800 border-neutral-800 text-neutral-300 hover:text-white shadow-md'
+                : 'bg-neutral-100 hover:bg-neutral-200 border-neutral-300 text-neutral-700 hover:text-neutral-950 shadow-sm'
             }`}
-            title="Reset Topology, Layout & Prompt to Default"
+            title="Reset Topology & View to Default"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-cyan-400 ${isResetting ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">{isResetting ? 'Resetting...' : 'Reset'}</span>
+            <RefreshCw className={`w-4 h-4 transition-transform ${isResetting ? 'animate-spin text-emerald-500' : isDark ? 'text-cyan-400' : 'text-slate-800'}`} />
           </button>
         </div>
       </div>

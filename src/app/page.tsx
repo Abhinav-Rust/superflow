@@ -41,7 +41,6 @@ export default function Home() {
   const [isBlueprintOpen, setIsBlueprintOpen] = useState<boolean>(false);
   const [selectedNodeData, setSelectedNodeData] = useState<ArchitectureNodeData | null>(null);
   const [isResetting, setIsResetting] = useState<boolean>(false);
-  const [showResetToast, setShowResetToast] = useState<boolean>(false);
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
 
   // React Flow state
@@ -176,93 +175,26 @@ export default function Home() {
     loadGraph(activeGraph, nextView);
   };
 
-  // Reset to original layout with physical motion, camera transition, and prompt restore
+  // Reset to original layout, prompt, and un-supercompiled state
   const handleReset = () => {
     setIsResetting(true);
-    setShowResetToast(true);
     setIsSupercompiledView(false);
     setSelectedNodeData(null);
 
     const originalPreset = ARCHITECTURE_PRESETS.find((p) => p.id === currentPresetId) || ARCHITECTURE_PRESETS[0];
     setActiveGraph(originalPreset);
     setPromptInput(originalPreset.spokenPrompt);
+    loadGraph(originalPreset, false);
 
-    const { analysis } = supercompileGraph(originalPreset);
-    setAnalysisResult(analysis);
-
-    // Deep fresh clone of nodes to force React Flow to physically mount & spring-animate
-    const idMap: Record<string, string> = {};
-    const timestamp = Date.now();
-
-    const formattedNodes: Node<ArchitectureNodeData>[] = originalPreset.nodes.map((n) => {
-      const newId = `${n.id}-${timestamp}`;
-      idMap[n.id] = newId;
-      return {
-        id: newId,
-        type: n.type,
-        position: { x: n.position.x, y: n.position.y },
-        data: { ...n.data },
-        className: 'node-reset-motion',
-      };
-    });
-
-    const formattedEdges: Edge<ArchitectureEdgeData>[] = originalPreset.edges.map((e) => ({
-      id: `${e.id}-${timestamp}`,
-      source: idMap[e.source] || e.source,
-      target: idMap[e.target] || e.target,
-      type: 'default',
-      animated: true,
-      data: e.data,
-      label: e.data?.label,
-      labelStyle: {
-        fill: isDark ? '#34d399' : '#047857',
-        fontSize: 10,
-        fontFamily: 'monospace',
-        fontWeight: 700,
-      },
-      labelBgStyle: {
-        fill: isDark ? '#141414' : '#f8fafc',
-        fillOpacity: 0.95,
-      },
-      labelBgPadding: [6, 3] as [number, number],
-      labelBgBorderRadius: 8,
-      style: {
-        stroke: isDark ? '#10b981' : '#059669',
-        strokeWidth: 2.5,
-      },
-    }));
-
-    setNodes(formattedNodes);
-    setEdges(formattedEdges);
-
-    // Animate viewport camera: pull back slightly then glide smoothly into centered view
     if (reactFlowInstance) {
-      try {
-        const vp = reactFlowInstance.getViewport();
-        reactFlowInstance.setViewport(
-          {
-            x: vp.x,
-            y: vp.y,
-            zoom: Math.max(0.35, vp.zoom * 0.9),
-          },
-          { duration: 200 }
-        );
-
-        setTimeout(() => {
-          reactFlowInstance.fitView({ padding: 0.16, duration: 650 });
-        }, 220);
-      } catch {
-        reactFlowInstance.fitView({ padding: 0.16, duration: 600 });
-      }
+      setTimeout(() => {
+        reactFlowInstance.fitView({ padding: 0.16, duration: 500 });
+      }, 50);
     }
 
     setTimeout(() => {
       setIsResetting(false);
-    }, 700);
-
-    setTimeout(() => {
-      setShowResetToast(false);
-    }, 2400);
+    }, 500);
   };
 
   // Handle Node Click to Expand into Detail Modal
@@ -333,16 +265,6 @@ export default function Home() {
             </p>
           </div>
         </div>
-
-        {/* Reset Motion Toast Notification */}
-        {showResetToast && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none reset-toast-enter">
-            <div className="flex items-center gap-2.5 px-4 py-2 rounded-xl border shadow-2xl backdrop-blur-md bg-emerald-500 text-neutral-950 border-emerald-400 font-mono text-xs font-black tracking-wide">
-              <RefreshCw className="w-4 h-4 animate-spin text-neutral-950" />
-              <span>Topology Restored &amp; Re-aligned</span>
-            </div>
-          </div>
-        )}
 
         {/* React Flow Viewport */}
         <ReactFlow
