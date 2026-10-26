@@ -35,56 +35,6 @@ export function VoiceInputBar({
   onToggleTheme,
 }: VoiceInputBarProps) {
   const isDark = theme === 'dark';
-  const [isListening, setIsListening] = useState(false);
-
-  // Toggle voice dictation (supports browser Web Speech API & Wispr Flow active visual state)
-  const handleVoiceToggle = () => {
-    const SpeechRecognition =
-      typeof window !== 'undefined'
-        ? (window as unknown as { SpeechRecognition?: any; webkitSpeechRecognition?: any }).SpeechRecognition ||
-          (window as unknown as { SpeechRecognition?: any; webkitSpeechRecognition?: any }).webkitSpeechRecognition
-        : null;
-
-    if (SpeechRecognition) {
-      if (isListening) {
-        setIsListening(false);
-      } else {
-        try {
-          const recognition = new SpeechRecognition();
-          recognition.continuous = false;
-          recognition.interimResults = true;
-          recognition.lang = 'en-US';
-
-          setIsListening(true);
-
-          recognition.onresult = (event: any) => {
-            const transcript = Array.from(event.results)
-              .map((result: any) => result[0].transcript)
-              .join('');
-            if (transcript) {
-              onPromptChange(transcript);
-            }
-          };
-
-          recognition.onerror = () => {
-            setIsListening(false);
-          };
-
-          recognition.onend = () => {
-            setIsListening(false);
-          };
-
-          recognition.start();
-        } catch {
-          setIsListening(false);
-        }
-      }
-    } else {
-      // Visual state for Wispr Flow dictation hotkey
-      setIsListening((prev) => !prev);
-      setTimeout(() => setIsListening(false), 4000);
-    }
-  };
 
   return (
     <header
@@ -205,41 +155,41 @@ export function VoiceInputBar({
         </div>
 
         {/* Input Bar & Action Buttons */}
-        <div className="flex items-center gap-2.5">
-          {/* Main Voice Prompt Input Bar */}
+        <div className="flex items-center gap-3">
+          {/* Main Voice Prompt Input Bar (Enlarged) */}
           <div className="relative flex-1">
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-              <Mic className={`w-4 h-4 ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`} />
+              <Mic className={`w-4 h-4 ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`} />
             </div>
             <input
               type="text"
               value={promptText}
               onChange={(e) => onPromptChange(e.target.value)}
               placeholder="Dictate your architecture via Wispr Flow (e.g. 'Build an event-driven payment engine with fraud checks, dead-letter retries, and invariant gates')..."
-              className={`w-full pl-10 pr-4 py-2.5 rounded-xl text-xs placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-sans transition border shadow-inner ${
+              className={`w-full pl-10 pr-4 py-3 rounded-xl text-sm placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-sans transition border shadow-inner ${
                 isDark
-                  ? 'bg-neutral-900/90 border-neutral-700/80 text-neutral-100'
-                  : 'bg-white border-slate-300 text-slate-900 font-medium'
+                  ? 'bg-neutral-900/90 border-neutral-700/80 text-neutral-100 focus:border-emerald-500/60'
+                  : 'bg-white border-slate-300 text-slate-950 font-medium focus:border-emerald-500'
               }`}
             />
           </div>
 
-          {/* Dedicated 'Hold Wispr & Speak' Button */}
-          <button
-            type="button"
-            onClick={handleVoiceToggle}
-            className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl font-mono text-xs font-bold transition-all duration-200 border shrink-0 shadow-sm ${
-              isListening
-                ? 'bg-rose-500/20 border-rose-500 text-rose-500 animate-pulse ring-2 ring-rose-500/30'
-                : isDark
-                ? 'bg-neutral-900 hover:bg-neutral-800 border-emerald-500/40 text-emerald-400 hover:border-emerald-400 shadow-emerald-950/20'
-                : 'bg-emerald-50 hover:bg-emerald-100 border-emerald-300 text-emerald-900 hover:border-emerald-500'
+          {/* Wispr Flow Guidance Box */}
+          <div
+            className={`hidden md:flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border text-xs font-mono shrink-0 shadow-sm ${
+              isDark
+                ? 'bg-neutral-900/90 border-neutral-800 text-neutral-300'
+                : 'bg-emerald-50/90 border-emerald-300 text-emerald-950 font-semibold'
             }`}
-            title="Click to dictate or hold your Wispr Flow hotkey"
           >
-            <Mic className={`w-4 h-4 ${isListening ? 'text-rose-500 animate-bounce' : isDark ? 'text-emerald-400' : 'text-emerald-700'}`} />
-            <span>{isListening ? 'Listening...' : 'Hold Wispr & Speak'}</span>
-          </button>
+            <span className="flex h-2 w-2 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <div className="leading-snug">
+              <span className="font-extrabold text-emerald-500 dark:text-emerald-400">Hold Wispr key to speak</span> — words appear in the box on the left.
+            </div>
+          </div>
 
           {/* Supercompile Action Button */}
           <button
